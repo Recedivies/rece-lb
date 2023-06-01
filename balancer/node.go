@@ -1,7 +1,8 @@
 package balancer
 
 type Node struct {
-	host string
+	host         string
+	requestCount uint32
 }
 
 // NewNode creates a new node

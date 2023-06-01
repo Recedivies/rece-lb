@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 )
 
 // A pool of all hosts and other conf
@@ -47,11 +48,20 @@ func (nodePool *NodePool) GetNode() (*Node, error) {
 		return node, nil
 	}
 
+	if nodePool.algorithm == "LeastConnection" {
+		nodePool.setDistributionAlgo(LeastConnectionAlgo{})
+		leastConnectionNode := nodePool.distributionAlgo.distribute(nodePool)
+
+		return leastConnectionNode, nil
+	}
+
 	return &Node{}, errors.New("algorithm not supported")
 }
 
 func (nodePool *NodePool) Director(req *http.Request) {
 	node, _ := nodePool.GetNode()
+	// increment the number of request the server is serving
+	atomic.AddUint32(&node.requestCount, 1)
 	log.Println(node)
 
 	u, _ := url.Parse(node.host)
