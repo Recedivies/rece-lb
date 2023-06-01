@@ -2,10 +2,9 @@ package balancer
 
 import "math/rand"
 
-type RandomAlgo struct{}
+type RandomOrderAlgo struct{}
 
-func (rr RandomAlgo) distribute(nodePool *NodePool) *Node {
-
+func (rr RandomOrderAlgo) distribute(nodePool *NodePool) *Node {
 	nodes := nodePool.np
 	maxLen := len(nodes)
 

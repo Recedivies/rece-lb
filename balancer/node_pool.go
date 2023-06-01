@@ -9,13 +9,13 @@ import (
 
 // A pool of all hosts and other conf
 type NodePool struct {
-	np             []*Node
-	algorithm      string
-	distributeAlgo DistributeAlgo
+	np               []*Node
+	algorithm        string
+	distributionAlgo DistributionAlgo
 }
 
-func (nodePool *NodePool) setDistributeAlgo(d DistributeAlgo) {
-	nodePool.distributeAlgo = d
+func (nodePool *NodePool) setDistributionAlgo(d DistributionAlgo) {
+	nodePool.distributionAlgo = d
 }
 
 // NewNodePool creates a new node pool
@@ -34,15 +34,15 @@ func NewNodePool(servers []string, algorithm string) *NodePool {
 // GetNode gets a new Node available to forward request to based on algorithm
 func (nodePool *NodePool) GetNode() (*Node, error) {
 	if nodePool.algorithm == "RoundRobin" {
-		nodePool.setDistributeAlgo(RoundRobinAlgo{})
-		nextNode := nodePool.distributeAlgo.distribute(nodePool)
+		nodePool.setDistributionAlgo(RoundRobinAlgo{})
+		nextNode := nodePool.distributionAlgo.distribute(nodePool)
 
 		return nextNode, nil
 	}
 
 	if nodePool.algorithm == "Random" {
-		nodePool.setDistributeAlgo(RandomAlgo{})
-		node := nodePool.distributeAlgo.distribute(nodePool)
+		nodePool.setDistributionAlgo(RandomOrderAlgo{})
+		node := nodePool.distributionAlgo.distribute(nodePool)
 
 		return node, nil
 	}

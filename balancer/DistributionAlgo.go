@@ -1,6 +1,6 @@
 package balancer
 
 // define interface for strategy classes
-type DistributeAlgo interface {
+type DistributionAlgo interface {
 	distribute(nodePool *NodePool) *Node
 }
