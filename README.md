@@ -26,7 +26,7 @@ pip install flask
 Start the loadbalancer
 
 ```bash
-go run loadbalancer.go
+go run main.go
 ```
 
 Spam the loadbalancer with requests
