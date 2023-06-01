@@ -34,11 +34,17 @@ func NewNodePool(servers []string, algorithm string) *NodePool {
 // GetNode gets a new Node available to forward request to based on algorithm
 func (nodePool *NodePool) GetNode() (*Node, error) {
 	if nodePool.algorithm == "RoundRobin" {
-		algo := RoundRobinAlgo{}
-		nodePool.setDistributeAlgo(algo)
+		nodePool.setDistributeAlgo(RoundRobinAlgo{})
 		nextNode := nodePool.distributeAlgo.distribute(nodePool)
 
 		return nextNode, nil
+	}
+
+	if nodePool.algorithm == "Random" {
+		nodePool.setDistributeAlgo(RandomAlgo{})
+		node := nodePool.distributeAlgo.distribute(nodePool)
+
+		return node, nil
 	}
 
 	return &Node{}, errors.New("algorithm not supported")
