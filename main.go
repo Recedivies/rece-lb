@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Recedivies/lb-go/balancer"
+	"github.com/Recedivies/rece-lb/balancer"
 	"github.com/spf13/viper"
 )
 

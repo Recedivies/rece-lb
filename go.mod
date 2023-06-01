@@ -1,4 +1,4 @@
-module github.com/Recedivies/lb-go
+module github.com/Recedivies/rece-lb
 
 go 1.20
 
