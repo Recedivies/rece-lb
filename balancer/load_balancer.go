@@ -1,6 +1,8 @@
 package balancer
 
-import "net/http/httputil"
+import (
+	"net/http/httputil"
+)
 
 // load balancer implemented on top of built in httpUtil.ReverseProxy
 type LoadBalancer struct {
@@ -16,7 +18,9 @@ func NewLoadBalancer(servers []string, algorithm string) *LoadBalancer {
 		np: np,
 		ReverseProxy: &httputil.ReverseProxy{
 			// this function is called before sending request to nodes
-			Director: np.Director,
+			Director:       np.director,
+			ModifyResponse: np.modifyResponse,
+			ErrorHandler:   np.errorHandler,
 		},
 	}
 

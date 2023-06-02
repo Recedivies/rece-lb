@@ -7,5 +7,5 @@
     "http://localhost:5004",
     "http://localhost:5005"
   ],
-  "algorithm": "RoundRobin"
+  "algorithm": "LeastConnection"
 }
