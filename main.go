@@ -9,17 +9,18 @@ import (
 )
 
 type Config struct {
-	Port      int      `json:"port"`
-	Servers   []string `json:"servers"`
-	Algorithm string   `json:"algorithm"`
+	Port                int      `mapstructure:"port"`
+	Servers             []string `mapstructure:"servers"`
+	Algorithm           string   `mapstructure:"algorithm"`
+	HealthCheckType     string   `mapstructure:"health_check_type"`
+	HealthCheckInterval int      `mapstructure:"health_check_interval"`
 }
 
 func main() {
 	config := Config{}
-	viper.AddConfigPath(".")
 	viper.SetConfigType("json")
-
-	viper.AutomaticEnv()
+	viper.AddConfigPath(".")
+	viper.SetConfigName("app.config")
 
 	_ = viper.ReadInConfig()
 	_ = viper.Unmarshal(&config)
@@ -30,5 +31,7 @@ func main() {
 	http.ListenAndServe(fmt.Sprintf(":%v", config.Port), balancer.NewLoadBalancer(
 		config.Servers,
 		config.Algorithm,
+		config.HealthCheckType,
+		config.HealthCheckInterval,
 	))
 }

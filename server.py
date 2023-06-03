@@ -8,7 +8,7 @@ serverName = sys.argv[1]
 
 @app.route("/")
 def hello():
-    return serverName
+    return serverName + "\n"
 
 
 if __name__ == "__main__":

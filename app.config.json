@@ -7,5 +7,7 @@
     "http://localhost:5004",
     "http://localhost:5005"
   ],
-  "algorithm": "LeastConnection"
+  "algorithm": "Random",
+  "health_check_type": "passive",
+  "health_check_interval": 5
 }

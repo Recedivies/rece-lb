@@ -2,8 +2,6 @@ package balancer
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -14,9 +12,11 @@ const ErrBackendUnreachable = "unsupported protocol"
 
 // A pool of all hosts and other conf
 type NodePool struct {
-	np               []*Node
-	algorithm        string
-	distributionAlgo DistributionAlgo
+	np                  []*Node
+	algorithm           string
+	distributionAlgo    DistributionAlgo
+	healthCheckType     string
+	healthCheckInterval int
 }
 
 func (nodePool *NodePool) setDistributionAlgo(d DistributionAlgo) {
@@ -24,15 +24,17 @@ func (nodePool *NodePool) setDistributionAlgo(d DistributionAlgo) {
 }
 
 // NewNodePool creates a new node pool
-func NewNodePool(servers []string, algorithm string) *NodePool {
+func NewNodePool(servers []string, algorithm, healthCheckType string, healthCheckInterval int) *NodePool {
 	var nodes []*Node
 	for _, server := range servers {
 		nodes = append(nodes, NewNode(server))
 	}
 
 	return &NodePool{
-		np:        nodes,
-		algorithm: algorithm,
+		np:                  nodes,
+		algorithm:           algorithm,
+		healthCheckType:     healthCheckType,
+		healthCheckInterval: healthCheckInterval,
 	}
 }
 
@@ -89,13 +91,12 @@ func (nodePool *NodePool) director(req *http.Request) {
 }
 
 func (nodePool *NodePool) modifyResponse(res *http.Response) error {
-	fmt.Println(res.StatusCode)
 	for _, n := range nodePool.np {
 		u, _ := url.Parse(n.Host)
 		if u.Host == res.Request.URL.Host {
 			// decrement the number of request the host is serving
 			atomic.AddUint32(&n.RequestCount, ^uint32(n.RequestCount-1))
-			log.Println(n)
+			// log.Println(n)
 			break
 		}
 	}
@@ -104,9 +105,7 @@ func (nodePool *NodePool) modifyResponse(res *http.Response) error {
 
 func (nodePool *NodePool) errorHandler(w http.ResponseWriter, req *http.Request, err error) {
 	if strings.Contains(err.Error(), ErrBackendUnreachable) {
-		http.Error(w, "Backend server is currently unreachable", http.StatusServiceUnavailable)
-		return
+		w.Write([]byte("Backend server is currently unreachable\n"))
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

@@ -11,8 +11,8 @@ type LoadBalancer struct {
 }
 
 // NewLoadBalancer creates a new node pool
-func NewLoadBalancer(servers []string, algorithm string) *LoadBalancer {
-	np := NewNodePool(servers, algorithm)
+func NewLoadBalancer(servers []string, algorithm, healthCheckType string, healthCheckInterval int) *LoadBalancer {
+	np := NewNodePool(servers, algorithm, healthCheckType, healthCheckInterval)
 
 	lb := &LoadBalancer{
 		np: np,
@@ -22,6 +22,10 @@ func NewLoadBalancer(servers []string, algorithm string) *LoadBalancer {
 			ModifyResponse: np.modifyResponse,
 			ErrorHandler:   np.errorHandler,
 		},
+	}
+	if healthCheckType == "passive" {
+		// starts passive health check if opted
+		go lb.StartPassiveHeathCheck()
 	}
 
 	return lb

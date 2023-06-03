@@ -1,7 +1,11 @@
 package balancer
 
 import (
+	"log"
+	"net"
+	"net/url"
 	"sync"
+	"time"
 )
 
 type Node struct {
@@ -19,6 +23,25 @@ func NewNode(host string) *Node {
 		RequestCount: 0,
 		Health:       true,
 	}
+}
+
+// ping checks if the node is alive.
+func (node *Node) isAlive() bool {
+	u, _ := url.Parse(node.Host)
+	conn, err := net.DialTimeout("tcp", u.Host, 1*time.Second)
+	if err != nil {
+		log.Println("node is unreachable: ", err)
+		return false
+	}
+	defer conn.Close()
+	return true
+}
+
+// markStatus marks the status of Health in Node.
+func (node *Node) markStatus(status bool) {
+	mutex.Lock()
+	node.Health = status
+	mutex.Unlock()
 }
 
 // getHealth returns the value of Health in Node.
